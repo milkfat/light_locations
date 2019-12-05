@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<!--
+ *  Copyright (c) 2015 The WebRTC project authors. All Rights Reserved.
+ *
+ *  Use of this source code is governed by a BSD-style license
+ *  that can be found in the LICENSE file in the root of the source
+ *  tree.
+-->
+<html>
+<head>
+
+    <meta charset="utf-8">
+    <meta name="description" content="WebRTC code samples">
+    <meta name="viewport" content="width=device-width, user-scalable=yes, initial-scale=1, maximum-scale=1">
+    <meta itemprop="description" content="Client-side WebRTC code samples">
+    <meta itemprop="name" content="WebRTC code samples">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta id="theme-color" name="theme-color" content="#ffffff">
+
+    <base target="_blank">
+
+    <title>getUserMedia to canvas</title>
+
+</head>
+
+<body>
+<p id = 'status'>Not connected</p>
+<video playsinline autoplay></video>
+<canvas></canvas>
+
+<script>
+
+
+		 /*
+		 *  Copyright (c) 2015 The WebRTC project authors. All Rights Reserved.
+		 *
+		 *  Use of this source code is governed by a BSD-style license
+		 *  that can be found in the LICENSE file in the root of the source
+		 *  tree.
+		 */
+
+
+		// Put variables in global scope to make them available to the browser console.
+		const video = document.querySelector('video');
+		const canvas = window.canvas = document.querySelector('canvas');
+		const context = canvas.getContext('2d');
+		canvas.width = 8;
+		canvas.height = 128;
+
+		
+		function videoToCanvas() {
+		  context.drawImage(video, video.videoWidth/2, 0, 8*video.videoHeight/128, video.videoHeight, 0, 0, canvas.width, canvas.height);
+		  //canvas.width = video.videoWidth;
+		  //canvas.height = video.videoHeight;
+		  //canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+		};
+
+		const constraints = {
+		  audio: false,
+		  video: { facingMode: 'environment' },
+		  width: 320,
+    	  height: 240
+		};
+
+		function handleSuccess(stream) {
+		  video.srcObject = stream;
+		}
+
+		function handleError(error) {
+		  console.log('navigator.MediaDevices.getUserMedia error: ', error.message, error.name);
+		}
+        //console.log(navigator.mediaDevices.enumerateDevices());
+		navigator.mediaDevices.getUserMedia(constraints).then(handleSuccess).catch(handleError);
+		
+		setInterval(videoToCanvas, 33);
+
+
+
+
+
+
+
+
+        /*   
+		*    Websocket stuff
+		 *   
+		  *  
+		 *   
+		*/   
+
+
+		 var buffer = new ArrayBuffer(3072);
+      	 var paneldata = new Uint8ClampedArray(buffer);
+      	 
+      	 var header_buffer = new ArrayBuffer(12);
+      	 var PPM_header = new Uint8ClampedArray(header_buffer);
+      	 PPM_header[0]=0x50;  // P
+      	 PPM_header[1]=0x36;  // 6
+      	 PPM_header[2]=0x0A;  // \n
+      	 PPM_header[3]=0x38;  // 8
+      	 PPM_header[4]=0x20;  // 
+      	 PPM_header[5]=0x36;  // 1
+      	 PPM_header[6]=0x34;  // 2
+      	 PPM_header[7]=0x0A;  // 8
+      	 PPM_header[8]=0x32;  // 2
+      	 PPM_header[9]=0x35;  // 5
+      	 PPM_header[10]=0x35; // 5
+      	 PPM_header[11]=0x0A; // \n
+         state = document.getElementById("status");
+
+		 var websocket;
+		 if (window.WebSocket === undefined) {
+            state.innerHTML = "sockets not supported";
+            state.className = "fail";
+         }else {
+             if (typeof String.prototype.startsWith != "function") {
+                String.prototype.startsWith = function (str) {
+                   return this.indexOf(str) == 0;
+                };
+             }
+         
+           window.addEventListener("load", onLoad, false);
+         }
+
+		 function onLoad() {
+		    setTimeout(openWebSocket, 500)
+		 }
+		 
+		 function openWebSocket() {
+            websocket = new WebSocket(((window.location.protocol === "https:") ? "wss://" : "ws://") + window.location.host + "/vid");
+            websocket.onopen = function(evt) { onOpen(evt) };
+            websocket.onclose = function(evt) { onClose(evt) };
+            websocket.onmessage = function(evt) { onMessage(evt) };
+            websocket.onerror = function(evt) { onError(evt) };
+         }
+		 
+		 var videoInterval;
+		 
+		 function onOpen(evt) {
+            state.className = "success";
+            state.innerHTML = "Connected to server";
+            setTimeout(function(){
+              videoInterval = setInterval(monitorCursors, 35);
+              }, 300);
+            
+         }
+         
+         function onClose(evt) {
+            state.className = "fail";
+            state.innerHTML = "Not connected. Attempting to reconnect...";
+            // Try to reconnect in 5 seconds
+            websocket = null;
+            clearInterval(videoInterval);
+            setTimeout(function(){onLoad()}, 500);
+         }
+
+         function onMessage(evt) {
+            var message = evt.data;
+         }
+         
+         function onError(evt) {
+           state.className = "fail";
+           state.innerHTML = "Communication error";
+         }
+         
+         
+         function monitorCursors () {
+            if (websocket) {
+				var imageData = context.getImageData(0, 0, 8, 128);
+			
+				//send PPM header
+				websocket.send(header_buffer);
+				//send binary RGB data
+				for (i = 0; i < 3072; i++) {
+				  var j = i*3; //sending RGB
+				  var k = i*4; //reading RGBA
+				  //multiply RGB values by the alpha channel value
+				  paneldata[j] = (imageData.data[k]*imageData.data[k+3])/255;
+				  paneldata[j+1] = (imageData.data[k+1]*imageData.data[k+3])/255;
+				  paneldata[j+2] = (imageData.data[k+2]*imageData.data[k+3])/255;
+				}
+				websocket.send(buffer);
+			}
+		}
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+
+		
+		
+		
+	</script>
+
+</body>
+</html>
