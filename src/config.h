@@ -1,39 +1,27 @@
 #ifndef LIGHTS_CONFIG_H
 #define LIGHTS_CONFIG_H
 
-CRGB leds[NUM_LEDS+1]; //create led object in memory
-
-CRGB canvas[NUM_LEDS]; //object for teh drawing
+#include "draw_variables.h"
+#include "scale.h"
+#include "light_sketches.h"
 
 char current_light_sketch = '-';
 boolean light_pulse_enabled = 0;
-byte global_brightness = 32;
-boolean filter_particles = 1;
 
-String display_text = "";
-boolean text_mask = 0;
-boolean invert_mask = 0;
-boolean text_filter = 1;
-boolean text_rotate = 0;
-#define NUM_TEXT_EFFECTS 5
-int text_effect = 0;
-byte led_mask[NUM_LEDS];
-byte led_mask2[NUM_LEDS];
-int text_color = -1;
-byte text_saturation = 255;
-byte text_brightness = 96;
-boolean scrolling_text_enabled = 0;
-boolean drawing_enabled = 0;
-byte current_font = 0;
-#define NUM_FONTS 8;
-unsigned long text_shake_time = 0;
-int ystp = 0;
-byte font_scaler = 48;
-byte debug_scaler = 128;
-byte camera_scaler = 200;
-byte screen_scaler = 100;
-byte default_color = 0;
-byte default_saturation = 255;
+//boolean text_filter = 1;
+//boolean text_rotate = 0;
+//#define NUM_TEXT_EFFECTS 5
+//int text_effect = 0;
+//int text_color = -1;
+//byte text_saturation = 255;
+//byte text_brightness = 96;
+//boolean scrolling_text_enabled = 0;
+//boolean drawing_enabled = 0;
+//byte current_font = 0;
+//#define NUM_FONTS 8;
+//unsigned long text_shake_time = 0;
+//int ystp = 0;
+//byte font_scaler = 48;
 
 
 //CONFIG STUFF
@@ -178,21 +166,21 @@ CONFIG_OPTION config_options[]
   CONFIG_OPTION("Light Pulses to Beat","lp",light_pulse_enabled,CHECKBOX),
   CONFIG_OPTION("Text Mask","tm",text_mask,CHECKBOX),
   CONFIG_OPTION("Invert Mask","im",text_mask,CHECKBOX),
-  CONFIG_OPTION("Text Filter","tf",text_filter,CHECKBOX),
-  CONFIG_OPTION("Text Rotate","tr",text_rotate,CHECKBOX),
-  CONFIG_OPTION("Text Color","tc",text_color,RANGE,-1),
-  CONFIG_OPTION("Text Saturation","tsa",text_saturation,RANGE),
-  CONFIG_OPTION("Text Brightness","tb",text_brightness,RANGE),
-  CONFIG_OPTION("Font Scale","fs",font_scaler,RANGE),
-  CONFIG_OPTION("Debug Scale","ds",debug_scaler,RANGE),
-  CONFIG_OPTION("Camera Z Position","cs",camera_scaler,RANGE),
-  CONFIG_OPTION("Screen Z Position","ss",screen_scaler,RANGE),
+  //CONFIG_OPTION("Text Filter","tf",text_filter,CHECKBOX),
+  //CONFIG_OPTION("Text Rotate","tr",text_rotate,CHECKBOX),
+  //CONFIG_OPTION("Text Color","tc",text_color,RANGE,-1),
+  //CONFIG_OPTION("Text Saturation","tsa",text_saturation,RANGE),
+  //CONFIG_OPTION("Text Brightness","tb",text_brightness,RANGE),
+  //CONFIG_OPTION("Font Scale","fs",font_scaler,RANGE),
+  //CONFIG_OPTION("Debug Scale","ds",debug_scaler,RANGE),
+  //CONFIG_OPTION("Camera Z Position","cs",camera_scaler,RANGE),
+  //CONFIG_OPTION("Screen Z Position","ss",screen_scaler,RANGE),
   CONFIG_OPTION("Default Color","dc",default_color,RANGE),
   CONFIG_OPTION("Default Saturation","dsa",default_saturation,RANGE),
-  CONFIG_OPTION("Current Font","cff",current_font),
-  CONFIG_OPTION("Scrolling Text","st",scrolling_text_enabled,CHECKBOX),
-  CONFIG_OPTION("Draw","dr",drawing_enabled,CHECKBOX),
-  CONFIG_OPTION("Display Text","text",display_text,TEXT),
+  //CONFIG_OPTION("Current Font","cff",current_font),
+  //CONFIG_OPTION("Scrolling Text","st",scrolling_text_enabled,CHECKBOX),
+  //CONFIG_OPTION("Draw","dr",drawing_enabled,CHECKBOX),
+  //CONFIG_OPTION("Display Text","text",display_text,TEXT),
   CONFIG_OPTION("EFFECT VARIATION","fl","v",BUTTON),
   CONFIG_OPTION("RESET ARDUINO","fl","R",BUTTON),
   CONFIG_OPTION("FORCE RESET ARDUINO","fl","X",BUTTON),

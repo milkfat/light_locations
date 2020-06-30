@@ -1,28 +1,22 @@
-class LEAF {
+#ifndef LIGHTS_LEAF_H
+#define LIGHTS_LEAF_H
+
+#include "light_sketches.h"
+
+    
+class LEAF: public LIGHT_SKETCH {
+  public:
+    LEAF() {setup();}
+    ~LEAF() {}
+
+    void reset() {}
+    void next_effect() {}
     byte stp = 0;
     unsigned int ypos = 0;
 
     
 
     class PLANET {
-        
-        int adjust (int p) {
-            int po = p;
-            if (po > 52) {
-                po+=2;
-            }
-            if (po > 79) {
-                po+=3;
-            }
-            if (po > 149) {
-                po = 349-po;
-            }
-            if(po >= 0 && po < NUM_LEDS) {
-                return po;
-            } else {
-                return NUM_LEDS;
-            }
-        }
 
     public:
 
@@ -140,4 +134,6 @@ class LEAF {
 
 };
 
-LEAF leaf;
+LIGHT_SKETCHES::REGISTER<LEAF> leaf("leaf");
+
+#endif

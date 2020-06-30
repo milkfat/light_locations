@@ -1,6 +1,16 @@
+#ifndef LIGHTS_FABULOUS_H
+#define LIGHTS_FABULOUS_H
 
+#include "light_sketches.h"
 
-class FABULOUS {
+class FABULOUS: public LIGHT_SKETCH {
+  public:
+    FABULOUS() {setup();}
+    ~FABULOUS() {}
+
+    void reset() {}
+    void next_effect() {}
+
     public:
     CRGB rgb;
     unsigned long time0 = millis(); //frame clock (lock to ~60fps)
@@ -808,4 +818,6 @@ class FABULOUS {
 };
 
 
-FABULOUS fabulous;
+LIGHT_SKETCHES::REGISTER<FABULOUS> fabulous("fabulous");
+
+#endif

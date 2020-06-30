@@ -1,86 +1,76 @@
+#ifndef LIGHTS_HALLOWEEN_H
+#define LIGHTS_HALLOWEEN_H
 
-class HALLOWEEN {
+#define NUM_HLIGHTS 3
+#define MAX_NUM_HLIGHTS 255
+
+#include "light_sketches.h"
+
+class HALLOWEEN: public LIGHT_SKETCH {
+    uint8_t num_hlights = NUM_HLIGHTS;
+    
+  public:
+    HALLOWEEN() {setup();}
+    ~HALLOWEEN() {}
+
+    void reset() {}
+    void next_effect() {}
+
+    
     unsigned char myArray[NUM_LEDS][3]; //create array to store HSV color
 
-    unsigned long time0 = millis();
-    int pos0 = 0;
-    int dir0 = 1;
-    unsigned long time1 = millis();
-    int pos1 = 10;
-    int dir1 = 1;
-    unsigned long time2 = millis();
-    int pos2 = 20;
-    int dir2 = -1;
+    struct HLIGHT {
+        unsigned long time = millis();
+        int pos = 0;
+        int dir = 1;
+        uint8_t hue = 0;
+    };
+
+
+    HLIGHT hlights[MAX_NUM_HLIGHTS];
+
     unsigned long time3 = millis();
     int pos3 = 0;
     
     public:
     
     void setup() { 
+      for (int i = 0; i < MAX_NUM_HLIGHTS; i++) {
+          hlights[i].pos = random(NUM_LEDS);
+          hlights[i].dir = 1;
+          if (random(2)) {
+              hlights[i].dir = -1;
+          }
+          hlights[i].hue = random(256);
+      }
+      control_variables.add(num_hlights, "Number of lights", 0, 255);
     }
 
     void loop() {
-        //ORANGE
-        if ((millis() - time0) > 50)
-            {
-            pos0 = (pos0+dir0+NUM_LEDS)%NUM_LEDS; //update the position according to chase direction
-            time0 = millis();
-
-            //try to make them bounce
-                if ((abs(pos0-pos1)<2) || (abs(pos0-pos2)<2) )// || (pos0 == 0) || (pos0 == (NUM_LEDS-1)))
+        
+        for (int i = 0; i < num_hlights; i++) {
+            if ((millis() - hlights[i].time) > 50)
                 {
-                    dir0 = -dir0;
+                hlights[i].pos = (hlights[i].pos+hlights[i].dir+NUM_LEDS)%NUM_LEDS; //update the position according to chase direction
+                hlights[i].time = millis();
+
+                //try to make them bounce
+                    for (int j = 0; j < num_hlights; j++) {
+                        if ( i != j && (abs(hlights[i].pos-hlights[j].pos)<2) )// || (pos0 == 0) || (pos0 == (NUM_LEDS-1)))
+                        {
+                            hlights[i].dir = -hlights[i].dir;
+                        }
+                    }
                 }
-            }
-            else
-            {
-            //leds[i].setHSV(18,255,255);
-            myArray[pos0][0] = 16;  // H orange
-            //myArray[pos0][0] = 171;  // H blue
-            myArray[pos0][1] = 255; // S
-            myArray[pos0][2] = 255; // V;
-            }
-
-        //GREEN
-        if ((millis() - time1) > 30)
-            {
-            pos1 = (pos1+dir1+NUM_LEDS)%NUM_LEDS; //update the position according to chase direction
-            time1 = millis();
-
-            //try to make them bounce
-                if ((abs(pos1-pos0)<2) || (abs(pos1-pos2)<2) )// || (pos1 == 0) || (pos1 == (NUM_LEDS-1)))
+                else
                 {
-                    dir1 = -dir1;
+                //leds[i].setHSV(18,255,255);
+                myArray[hlights[i].pos][0] = hlights[i].hue;  // H orange
+                //myArray[pos0][0] = 171;  // H blue
+                myArray[hlights[i].pos][1] = 255; // S
+                myArray[hlights[i].pos][2] = 255; // V;
                 }
-            }
-            else
-            {
-            //leds[i].setHSV(96,255,255);
-            myArray[pos1][0] = 96;  // H
-            myArray[pos1][1] = 255; // S
-            myArray[pos1][2] = 255; // V;
-            }
-
-        //PURPLE
-        if ((millis() - time2) > 40)
-            {
-            pos2 = (pos2+dir2+NUM_LEDS)%NUM_LEDS; //update the position according to chase direction
-            time2 = millis();
-
-            //try to make them bounce
-                if ((abs(pos2-pos0)<2) || (abs(pos2-pos1)<2) )// || (pos2 == 0) || (pos2 == (NUM_LEDS-1)))
-                {
-                    dir2 = -dir2;
-                }
-            }
-            else
-            {
-            //leds[i].setHSV(192,255,255);
-            myArray[pos2][0] = 192;  // H purple
-            myArray[pos2][1] = 255; // S
-            myArray[pos2][2] = 255; // V;
-            }
-
+        }
 
         for ( int i = 0; i < NUM_LEDS; i++ )
         {
@@ -112,13 +102,12 @@ class HALLOWEEN {
             }
             
 
-            FastLED.show(); //update LEDs
-
+            LED_show(); //update LEDs
 
             
-            //fadeToBlackBy(leds, NUM_LEDS, 2); //fade the entire array by a small percentage on each pass
-            delay(2);
     } 
 };
 
-HALLOWEEN halloween;
+LIGHT_SKETCHES::REGISTER<HALLOWEEN> halloween("halloween");
+
+#endif

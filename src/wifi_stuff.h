@@ -1,4 +1,3 @@
-//OTA (Over the Air programming)
 
  const char* ssid     = "moonraker";
  const char* password = "pastrylikesyou";
@@ -7,10 +6,31 @@
 
 #include <ESPmDNS.h>
 //#include <WiFiUdp.h>
-#include <ArduinoOTA.h>
 #include <Wifi.h>
 
 volatile int handling_ota = 0;
+
+void wifi_check() {
+  if ( WiFi.status() !=  WL_CONNECTED )
+  {
+    // wifi down, reconnect here
+    WiFi.begin();
+    int WLcount = 0;
+    int UpCount = 0;
+    while (WiFi.status() != WL_CONNECTED && WLcount < 200 ) 
+    {
+        delay( 100 );
+        Serial.printf(".");
+        if (UpCount >= 60)  // just keep terminal from scrolling sideways
+        {
+            UpCount = 0;
+            Serial.printf("\n");
+        }
+        ++UpCount;
+        ++WLcount;
+    }
+  }
+}
 
 void wifi_setup() {
 
@@ -70,46 +90,4 @@ void wifi_setup() {
 
     WiFi.scanDelete();
 
-    
-    ArduinoOTA
-        .onStart([]() {
-        handling_ota = 1;
-        String type;
-        if (ArduinoOTA.getCommand() == U_FLASH)
-            type = "sketch";
-        else // U_SPIFFS
-            type = "filesystem";
-
-        // NOTE: if updating SPIFFS this would be the place to unmount SPIFFS using SPIFFS.end()
-        #ifdef DEBUG
-        Serial.println("Start updating " + type);
-        #endif
-        })
-        .onEnd([]() {
-        handling_ota = 0;
-        #ifdef DEBUG
-        Serial.println("\nEnd");
-        #endif
-        })
-        .onProgress([](unsigned int progress, unsigned int total) {
-        #ifdef DEBUG
-        Serial.printf("Progress: %u%%\r", (progress / (total / 100)));
-        #endif
-        })
-        .onError([](ota_error_t error) {
-        handling_ota = 0;
-        #ifdef DEBUG
-        Serial.printf("Error[%u]: ", error);
-        if (error == OTA_AUTH_ERROR) Serial.println("Auth Failed");
-        else if (error == OTA_BEGIN_ERROR) Serial.println("Begin Failed");
-        else if (error == OTA_CONNECT_ERROR) Serial.println("Connect Failed");
-        else if (error == OTA_RECEIVE_ERROR) Serial.println("Receive Failed");
-        else if (error == OTA_END_ERROR) Serial.println("End Failed");
-        #endif
-        });
-
-    ArduinoOTA.begin();
-    #ifdef DEBUG
-    Serial.println("OTA Ready");
-    #endif
 }

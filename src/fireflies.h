@@ -1,3 +1,11 @@
+#ifndef LIGHTS_FIREFLIES_H
+#define LIGHTS_FIREFLIES_H
+
+
+#define FIREFLY_AMOUNT 17 //amount of fireflies
+#define MAX_FIREFLY_AMOUNT 255
+
+#include "light_sketches.h"
 
 class FIREFLY {
   
@@ -99,32 +107,40 @@ class FIREFLY {
      
 };
 
-struct FIREFLIES {
-    #define FIREFLY_AMOUNT 17 //amount of fireflies
-    FIREFLY firefly[FIREFLY_AMOUNT]; //create our firefly objects
+class FIREFLIES: public LIGHT_SKETCH {
+  uint8_t number_of_flies = FIREFLY_AMOUNT;
+  public:
+    FIREFLIES() {setup();}
+    ~FIREFLIES() {}
+
+    void reset() {}
+    void next_effect() {}
+
+    FIREFLY firefly[MAX_FIREFLY_AMOUNT]; //create our firefly objects
+
     void setup() {
 
-    for (int i = 0; i < FIREFLY_AMOUNT; i++)
-      {
-        firefly[i].init(); //initialize our fireflies
-      }
+      for (int i = 0; i < MAX_FIREFLY_AMOUNT; i++)
+        {
+          firefly[i].init(); //initialize our fireflies
+        }
+      control_variables.add(number_of_flies, "Number of fireflies", 0, 255);
     }
 
     void loop() { //firefly
-    for (int i = 0; i < FIREFLY_AMOUNT; i++)
-      {
-        firefly[i].upd(); //update each firefly
-      }
+
+      LED_show(); //update the LED string
+      LED_black();
+
+      for (int i = 0; i < number_of_flies; i++)
+        {
+          firefly[i].upd(); //update each firefly
+        }
       
-     FastLED.show(); //update the LED string
   
-     for (int i = 0; i < NUM_LEDS; i++) //fade our led string to create firefly trails
-       {
-        leds[i].r *= .8;
-        leds[i].g *= .8;
-        leds[i].b *= .8;
-       }
     }
 };
 
-FIREFLIES fireflies;
+LIGHT_SKETCHES::REGISTER<FIREFLIES> fireflies("fireflies");
+
+#endif
