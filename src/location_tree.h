@@ -50,6 +50,7 @@ static inline __attribute__ ((always_inline)) uint32_t XY(const int& x, const in
 #include "common.h"
 //#include "bushes.h"
 #include "tree_sim.h"
+#include "tree_test.h"
 //#include "candy_cane.h"
 
 #include "fireflies.h"
@@ -176,7 +177,6 @@ void location_setup() {
         int relative_position = i - tree_center[tree_center_pos-1];
         relative_position+=(i/100 - tree_center[tree_center_pos-1]/100)*2; //account for the gap between strings of 100
 
-        
         tree_coords[i].x = (relative_position*256) / circle_size; //radial coordinates? how dumb of me...
         tree_radians[i] = tree_coords[i].x;
         // y coordinates
@@ -184,6 +184,17 @@ void location_setup() {
 
         // z coordinates
         tree_coords[i].z = ease8InOutCubic(abs(128-tree_coords[i].x)*2);
+
+        VECTOR3 vec = VECTOR3(0, -20*256, -4*256);
+        rotate_y(vec, (relative_position*240) / circle_size);
+        vec.y += (circle_height*256) + (relative_position*256) / circle_size;
+        if ( i >= NUM_LEDS0) {
+            vec.y -= 30*256;
+            vec.x += 10*256;
+            vec.z += 10*256;
+        }
+        tree_coords[i] = vec;
+
 
 
     }

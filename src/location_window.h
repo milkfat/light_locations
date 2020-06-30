@@ -14,6 +14,10 @@
 #define LIGHTS_ADJUST
 uint8_t adjust(int x);
 
+#include "vector3.h"
+
+VECTOR3 tree_coords[NUM_LEDS+1]; //xyz coordinates for each pixel in 3d space
+
 void update_matrix();
 
 #include "config.h"
@@ -38,7 +42,27 @@ void update_matrix();
 #include "phosphene.h"
 
 void location_setup() { 
+  //lines of LEDS with the x,y coordinates for each end
+    int sects[6][6] =
+    {
+      {  0, 31, -30, -20, -30,  10},
+      { 31, 23, -30,  10, -10,  20},
+      { 54, 54, -10,  20,  30,   0},
+      {108, 21,  30,   0,  30, -20},
+      {129, 71,  30, -20, -30, -20},
+    };
 
+//figure out the distance of each pixel from the starting point
+    for (byte i = 0; i < 6; i++) {
+      for (int j = sects[i][0]; j < sects[i][0]+sects[i][1]; j++) {
+        int x2 = map( j, sects[i][0], sects[i][0]+sects[i][1], sects[i][2], sects[i][4]);
+        int y2 = map( j, sects[i][0], sects[i][0]+sects[i][1], sects[i][3], sects[i][5]);
+        
+        tree_coords[j].x = x2*256;
+        tree_coords[j].y = y2*256;
+        tree_coords[j].z = 0;
+      }
+    }
 
     Serial.println("light sketch initial loop started");
     delay(1000);
